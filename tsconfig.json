@@ -1,0 +1,11 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2017",
+    "strictNullChecks": true,
+    "outDir": "dist",
+    "sourceMap": true
+  }
+}
