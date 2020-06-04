@@ -1,5 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const sql_to_firebase_sku_1 = require("./exchange/sql-to-firebase-sku");
-sql_to_firebase_sku_1.ExportSKUToFireStore().catch(() => { });
+// import { ExportSKUToFireStore } from "./exchange/sql-to-firebase-sku";
+// ExportSKUToFireStore().catch(() => { });
+console.log("start");
 //# sourceMappingURL=index.js.map

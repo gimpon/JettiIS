@@ -26,6 +26,10 @@ const sqlConfig: SQLConnectionConfig = {
     min: 0,
     max: 1000,
     idleTimeoutMillis: 20 * 60 * 1000
+  },
+  batch: {
+    min: 0,
+    max: 1000,
   }
 };
 import { SQLPool } from '../sql/sql-pool';

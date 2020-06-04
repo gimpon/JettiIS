@@ -22,6 +22,10 @@ const sqlConfigDefault = {
         min: 0,
         max: 1000,
         idleTimeoutMillis: 20 * 60 * 1000
+    },
+    batch: {
+        min: 0,
+        max: 1000,
     }
 };
 exports.DEFAULT_POOL = new sql_pool_1.SQLPool(sqlConfigDefault);

@@ -1,3 +1,4 @@
-import { ExportSKUToFireStore } from "./exchange/sql-to-firebase-sku";
+// import { ExportSKUToFireStore } from "./exchange/sql-to-firebase-sku";
 
-ExportSKUToFireStore().catch(() => { });
+// ExportSKUToFireStore().catch(() => { });
+console.log("start")

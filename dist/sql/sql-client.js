@@ -34,9 +34,10 @@ class SQLClient {
       ${sql}
     `;
     }
-    manyOrNone(sql, params = []) {
+    async manyOrNone(sql, params = []) {
         return (new Promise(async (resolve, reject) => {
             try {
+                const result = [];
                 const connection = this.connection ? this.connection : await this.sqlPool.pool.acquire().promise;
                 const request = new tedious_1.Request(this.prepareSession(sql), (error, rowCount, rows) => {
                     if (!this.connection)
@@ -45,13 +46,15 @@ class SQLClient {
                         return reject(error);
                     if (!rowCount)
                         return resolve([]);
-                    const result = rows.map(row => {
-                        const data = {};
-                        row.forEach(col => data[col.metadata.colName] = col.value);
-                        return this.complexObject(data);
-                    });
-                    return resolve(result);
                 });
+                request.on('row', (row) => {
+                    const data = {};
+                    row.forEach(col => data[col.metadata.colName] = col.value);
+                    result.push(this.complexObject(data));
+                });
+                request.on('done', (rowCount, more, rows) => resolve(result));
+                request.on('requestCompleted', () => resolve(result));
+                request.on('error', (err) => reject(err));
                 this.setParams(params, request);
                 connection.execSql(request);
             }
@@ -63,7 +66,7 @@ class SQLClient {
     async manyOrNoneStream(sql, params = [], onRow, onDone) {
         try {
             const connection = this.connection ? this.connection : await this.sqlPool.pool.acquire().promise;
-            const request = new tedious_1.Request(this.prepareSession(sql), (error, rowCount, rows) => {
+            const request = new tedious_1.Request(sql, (error, rowCount, rows) => {
                 if (error)
                     throw new Error(error.message);
             });
@@ -76,9 +79,10 @@ class SQLClient {
             throw new Error(error);
         }
     }
-    oneOrNone(sql, params = []) {
+    async oneOrNone(sql, params = []) {
         return new Promise(async (resolve, reject) => {
             try {
+                let result = null;
                 const connection = this.connection ? this.connection : await this.sqlPool.pool.acquire().promise;
                 const request = new tedious_1.Request(this.prepareSession(sql), (error, rowCount, rows) => {
                     if (!this.connection)
@@ -87,11 +91,16 @@ class SQLClient {
                         return reject(error);
                     if (!rowCount)
                         return resolve(null);
-                    const data = {};
-                    rows[0].forEach(col => data[col.metadata.colName] = col.value);
-                    const result = this.complexObject(data);
-                    return resolve(result);
                 });
+                request.on('row', (row) => {
+                    const data = {};
+                    row.forEach(col => data[col.metadata.colName] = col.value);
+                    // return resolve(result);
+                    result = this.complexObject(data);
+                });
+                request.on('done', (rowCount, more, rows) => resolve(result));
+                request.on('requestCompleted', () => resolve(result));
+                request.on('error', (err) => reject(err));
                 this.setParams(params, request);
                 connection.execSql(request);
             }

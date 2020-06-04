@@ -1,9 +1,10 @@
 {
-  "name": "sql-firebase",
+  "name": "jetti-is",
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "start": "tsc && node --max-old-space-size=8192 dist/index.js",
+    "test": "tsc && node --max-old-space-size=8192 dist/test.js",
     "tsc": "tsc"
   },
   "private": true,

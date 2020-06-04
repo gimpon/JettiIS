@@ -4,29 +4,34 @@ const sql_client_1 = require("../sql/sql-client");
 const dotenv_1 = require("dotenv");
 dotenv_1.config();
 const sqlConfig = {
-    server: process.env.DB_HOST,
+    server: process.env.S_DB_HOST,
     authentication: {
         type: 'default',
         options: {
-            userName: process.env.DB_USER,
-            password: process.env.DB_PASSWORD
+            userName: process.env.S_DB_USER,
+            password: process.env.S_DB_PASSWORD
         }
     },
     options: {
         trustServerCertificate: false,
         encrypt: false,
-        database: process.env.DB_NAME,
-        port: parseInt(process.env.DB_PORT, undefined),
+        database: process.env.S_DB_NAME,
+        port: parseInt(process.env.S_DB_PORT, undefined),
         requestTimeout: 2 * 60 * 1000,
     },
     pool: {
         min: 0,
         max: 1000,
         idleTimeoutMillis: 20 * 60 * 1000
+    },
+    batch: {
+        min: 0,
+        max: 1000,
     }
 };
 const sql_pool_1 = require("../sql/sql-pool");
 const SQLAdmin = new sql_pool_1.SQLPool(sqlConfig);
+///////////////////////////////////////////////////////////
 const firebaseAdmin = require("firebase-admin");
 firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert({
@@ -35,6 +40,7 @@ firebaseAdmin.initializeApp({
         projectId: process.env.project_id
     })
 });
+///////////////////////////////////////////////////////////
 const transformSKU = (source) => {
     return {
         id: source.id,
@@ -73,7 +79,7 @@ async function ExportSKUToFireStore() {
         const SKU = transformSKU(rawDoc);
         prices.push({ lagerId: SKU.id, price: SKU.price });
         batch.push(SKU);
-        if (batch.length === 100000) {
+        if (batch.length === 1000) {
             req.pause();
             console.log('inserting to firebase', i, 'docs');
             for (const doc of batch)
