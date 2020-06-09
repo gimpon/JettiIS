@@ -30,10 +30,65 @@ export async function noSqlDocument(doc: any, tx: SQLClient) {
 
 }
 
-export async function updateDocument(doc: any, tx: SQLClient) {
+export async function updateDocument(jsonDoc: string, id: string, tx: SQLClient) {
+    const response = await tx.oneOrNone(`
+      UPDATE Documents
+        SET
+          type = i.type, parent = i.parent,
+          date = i.date, code = i.code, description = i.description,
+          posted = i.posted, deleted = i.deleted, isfolder = i.isfolder,
+          "user" = i."user", company = i.company, info = i.info, timestamp = GETDATE(),
+          doc = i.doc,
+          ExchangeCode = i.ExchangeCode, ExchangeBase = i.ExchangeBase
+        FROM (
+          SELECT *
+          FROM OPENJSON(@p1) WITH (
+            [id] UNIQUEIDENTIFIER,
+            [date] DATETIME,
+            [type] NVARCHAR(100),
+            [code] NVARCHAR(36),
+            [description] NVARCHAR(150),
+            [posted] BIT,
+            [deleted] BIT,
+            [isfolder] BIT,
+            [company] UNIQUEIDENTIFIER,
+            [user] UNIQUEIDENTIFIER,
+            [info] NVARCHAR(max),
+            [parent] UNIQUEIDENTIFIER,
+            [doc] NVARCHAR(max) N'$.doc' AS JSON,
+            [ExchangeCode] NVARCHAR(50),
+            [ExchangeBase] NVARCHAR(50)
+          )
+        ) i
+      WHERE Documents.id = i.id;
+    SELECT * FROM Documents WHERE id = @p2`, [jsonDoc, id]);
+    return response;
+}
 
-    const nsDoc = await noSqlDocument(doc, tx);
-    console.log(noSqlDocument);
-    //const jsonDoc = JSON.stringify(noSqlDocument);
-    
+export async function insertDocument(jsonDoc: string, exchangeCode: string, exchangeBase: string, tx: SQLClient) {
+    const response = await tx.oneOrNone(`
+        INSERT INTO Documents(
+        [type], [date], [code], [description], [posted], [deleted],
+        [parent], [isfolder], [company], [user], [info], [doc], [ExchangeCode], [ExchangeBase])
+        SELECT
+        [type], getdate(), [code], [description], [posted], [deleted],
+        [parent], [isfolder], [company], [user], [info], [doc], [ExchangeCode], [ExchangeBase]
+        FROM OPENJSON(@p1) WITH (
+        [date] DATETIME,
+        [type] NVARCHAR(100),
+        [code] NVARCHAR(36),
+        [description] NVARCHAR(150),
+        [posted] BIT,
+        [deleted] BIT,
+        [parent] UNIQUEIDENTIFIER,
+        [isfolder] BIT,
+        [company] UNIQUEIDENTIFIER,
+        [user] UNIQUEIDENTIFIER,
+        [info] NVARCHAR(max),
+        [doc] NVARCHAR(max) N'$.doc' AS JSON,
+        [ExchangeCode] NVARCHAR(50),
+        [ExchangeBase] NVARCHAR(50)
+        );
+        SELECT * FROM Documents WHERE ExchangeCode = @p2 and ExchangeBase = @p3`, [jsonDoc, exchangeCode, exchangeBase]);
+    return response;
 }

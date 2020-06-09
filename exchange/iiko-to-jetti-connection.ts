@@ -4,7 +4,6 @@ import { ColumnValue, Request } from 'tedious';
 import { config as dotenv } from 'dotenv';
 import { SQLConnectionConfig } from '../sql/interfaces';
 
-
 dotenv();
 
 export interface ISyncParams {
@@ -90,7 +89,7 @@ export async function GetSqlConfig(baseid: string): Promise<SQLConnectionConfig>
     },
     batch: {
       min: 0,
-      max: 1000,
+      max: 10,
     }
   }
   return SqlConfig;
