@@ -1,7 +1,8 @@
 // Test exchange modules...
 
 import { AutosincIkoToJetty } from "./exchange/iiko-to-jetti-autosync";
+import { IJettiProject, SMVProject } from "./exchange/jetti-projects";
 
-const proj: string = 'SMV';
+const proj: IJettiProject = SMVProject;
 
-AutosincIkoToJetty(proj).catch(() => { });
+AutosincIkoToJetty(proj, 'Russia').catch(() => { });
