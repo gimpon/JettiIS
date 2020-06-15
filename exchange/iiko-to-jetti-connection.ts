@@ -104,7 +104,7 @@ export async function GetSqlConfig(baseid: string): Promise<SQLConnectionConfig>
     },
     batch: {
       min: 0,
-      max: 10,
+      max: 100,
     }
   }
   return SqlConfig;

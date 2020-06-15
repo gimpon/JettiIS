@@ -24,7 +24,8 @@ export async function AutosincIkoToJetty(project: IJettiProject, syncSource: str
 
     //!console.log("Справочник номенклатуры");
 
-    console.log("Справочник контрагентов");
+    const dt = new Date();
+    console.log("Справочник контрагентов. Старт", dt.toString());
     ImportCounterpartieToJetti(syncParams).catch(() => { });
 
     //!console.log("Справочник физлица&менеджеры");

@@ -85,13 +85,13 @@ const newCounterpartie = (syncParams: ISyncParams, iikoCounterpartie: IiikoCount
 async function syncCounterpartie (syncParams: ISyncParams, iikoCounterpartie: IiikoCounterpartie, destSQL: SQLClient ): Promise<any> {
   let response: any = await GetCatalog(iikoCounterpartie.project, iikoCounterpartie.id, iikoCounterpartie.baseid, 'Counterpartie', destSQL);
   if (response === null) {
-    console.log('insert Counterpartie', iikoCounterpartie.name);
+    //console.log('insert Counterpartie', iikoCounterpartie.name);
     const NoSqlDocument: any = newCounterpartie(syncParams, iikoCounterpartie);
     const jsonDoc = JSON.stringify(NoSqlDocument);
     response = await InsertCatalog(jsonDoc, NoSqlDocument.id, iikoCounterpartie, destSQL);
   }
   else {
-    console.log('update Counterpartie', iikoCounterpartie.name);
+    //console.log('update Counterpartie', iikoCounterpartie.name);
     response.type = 'Catalog.Counterpartie';
     response.code = syncParams.source.code + '-'+iikoCounterpartie.code;
     response.description = iikoCounterpartie.name;
@@ -175,7 +175,8 @@ export async function ImportCounterpartieSQLToJetti(syncParams: ISyncParams) {
           for (const doc of batch) await syncCounterpartie(syncParams, doc, dsql);
         }
         // выход из скрипта...
-        console.log('Скрипт переливки завершен.');
+        const dt = new Date();
+        console.log('Скрипт переливки завершен. ', dt.toString());
         process.exit(0);
     });    
 
