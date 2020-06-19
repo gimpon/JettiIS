@@ -3,6 +3,8 @@
 import { AutosincIkoToJetty } from "./exchange/iiko-to-jetti-autosync";
 import { IJettiProject, SMVProject } from "./exchange/jetti-projects";
 
-const proj: IJettiProject = SMVProject;
+//! временно. будeт задаваться в параметрах задания
+const proj: IJettiProject = SMVProject; 
+const source: string = 'Russia';
 
-AutosincIkoToJetty(proj, 'Russia').catch(() => { });
+AutosincIkoToJetty(proj, source).catch(() => { });

@@ -20,7 +20,9 @@ export interface ISyncParams {
   lastSyncDate: Date,       // дата последней автосинхронизации
   autosync: boolean,        // автосинхронизация данных
   forcedUpdate: boolean,    // принудитеольное обновление данных (если false - обновляются только новые и у которых не совпадает версия данных)
-  logLevel: number          // уровень логирования: 0-ошибки, 1-общая информация, 2-детальная информация
+  logLevel: number,         // уровень логирования: 0-ошибки, 1-общая информация, 2-детальная информация,
+  startTime: Date,          // время старта
+  finishTime: Date | null   // время завершение
 }
 export interface ISyncCatalog {
   // элемент таблицы dbo.catalog

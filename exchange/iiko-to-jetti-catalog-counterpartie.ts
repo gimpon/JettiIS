@@ -77,8 +77,6 @@ const newCounterpartie = (syncParams: ISyncParams, iikoCounterpartie: IiikoCount
     company: syncParams.source.company,
     user: null,
     info: null
-    //,ExchangeCode: iikoCounterpartie.id,
-    // ExchangeBase: iikoCounterpartie.baseid
   }
 }
 ///////////////////////////////////////////////////////////
@@ -91,27 +89,27 @@ async function syncCounterpartie (syncParams: ISyncParams, iikoCounterpartie: Ii
     response = await InsertCatalog(jsonDoc, NoSqlDocument.id, iikoCounterpartie, destSQL);
   }
   else {
-    //console.log('update Counterpartie', iikoCounterpartie.name);
-    response.type = 'Catalog.Counterpartie';
-    response.code = syncParams.source.code + '-'+iikoCounterpartie.code;
-    response.description = iikoCounterpartie.name;
-    response.posted = !iikoCounterpartie.deleted;
-    response.deleted = !!iikoCounterpartie.deleted;
-    response.doc.kind = 'ЮрЛицо';
-    response.doc.FullName = iikoCounterpartie.name;
-    response.doc.Client = iikoCounterpartie.isClient;
-    response.doc.Supplier = iikoCounterpartie.isSuplier;
-    response.doc.isInternal = false;
-    response.isfolder = iikoCounterpartie.isfolder;
-    response.company = syncParams.source.company;
-    response.parent = syncParams.source.CounterpartieFolder;
-    response.user = null;
-    response.info = null;
-    //response.ExchangeCode = iikoCounterpartie.id;
-    //response.ExchangeBase = iikoCounterpartie.baseid;
+    if (syncParams.forcedUpdate) {
+      //console.log('update Counterpartie', iikoCounterpartie.name);
+      response.type = 'Catalog.Counterpartie';
+      response.code = syncParams.source.code + '-' + iikoCounterpartie.code;
+      response.description = iikoCounterpartie.name;
+      response.posted = !iikoCounterpartie.deleted;
+      response.deleted = !!iikoCounterpartie.deleted;
+      response.doc.kind = 'ЮрЛицо';
+      response.doc.FullName = iikoCounterpartie.name;
+      response.doc.Client = iikoCounterpartie.isClient;
+      response.doc.Supplier = iikoCounterpartie.isSuplier;
+      response.doc.isInternal = false;
+      response.isfolder = iikoCounterpartie.isfolder;
+      response.company = syncParams.source.company;
+      response.parent = syncParams.source.CounterpartieFolder;
+      response.user = null;
+      response.info = null;
 
-    const jsonDoc = JSON.stringify(response);
-    response = await UpdateCatalog(jsonDoc, response.id, iikoCounterpartie, destSQL);
+      const jsonDoc = JSON.stringify(response);
+      response = await UpdateCatalog(jsonDoc, response.id, iikoCounterpartie, destSQL);
+    }
   }
   // console.log(response);
   return response;
@@ -139,7 +137,7 @@ export async function ImportCounterpartieSQLToJetti(syncParams: ISyncParams) {
     let i = 0;
     let batch: any[] = [];
     await ssql.manyOrNoneStream(`
-        SELECT -- top 145
+        SELECT --top 115
             cast(spr.id as nvarchar(50)) as id,
             coalesce(spr.deleted,0) as deleted,
             coalesce(cast(spr.[xml] as xml).value('(/r/name/customValue)[1]' ,'nvarchar(255)'),
@@ -163,7 +161,7 @@ export async function ImportCounterpartieSQLToJetti(syncParams: ISyncParams) {
 
       if (batch.length === ssqlcfg.batch.max) {
         req.pause();
-        console.log('inserting to batch', i, 'docs');
+        console.log('inserting to batch', i, 'Counterparties');
         for (const doc of batch) await syncCounterpartie(syncParams, doc, dsql);
         batch = [];
         req.resume();
@@ -171,13 +169,14 @@ export async function ImportCounterpartieSQLToJetti(syncParams: ISyncParams) {
     },
     async (rowCount: number, more: boolean) => {
         if (rowCount && !more && batch.length > 0) {
-          console.log('inserting tail', batch.length, 'docs');
+          console.log('inserting tail', batch.length, 'Counterparties');
           for (const doc of batch) await syncCounterpartie(syncParams, doc, dsql);
         }
+        console.log('Finish sync Counterparties.')
         // выход из скрипта...
-        const dt = new Date();
-        console.log('Скрипт переливки завершен. ', dt.toString());
-        process.exit(0);
+        //const dt = new Date();
+        //console.log('Скрипт переливки завершен. ', dt.toString());
+        //process.exit(0);
     });    
 
 }

@@ -2,19 +2,28 @@
 
 import { Ref } from "./iiko-to-jetti-utils"
 
+// интерфейс базы источника данных
 export interface IExchangeSource {
-    id: string,
-    code: string,
-    firstDate: Date,
-    company: string,
-    currency: string,
-    TransitStorehouse: string,
-    CounterpartieFolder: Ref,
-    ProductFolder: Ref,
-    exchangeStores: string[],
-    exchangeDeparments: string[]
+    id: string,                     // id базы
+    code: string,                   // префикс для кодов документов/справочников
+    firstDate: Date,                // дата с которой ведется учет
+    company: string,                // корневая(родительская) компания
+    currency: string,               // валюта
+    TransitStorehouse: string,      // транзитный склад
+    CounterpartieFolder: Ref,       // папка для контрагентов в базе приемнике
+    ProductFolder: Ref,             // папка для номенклатуры в базе приемнике
+    exchangeStores: string[],       // список складов для синхронизации (если пустой массив - все имеющиеся)
+    exchangeDeparments: string[]    // список подразделений для синхронизации (если пустой массив - все имеющиеся)
 }
 
+// интерфейс проекта
+export interface IJettiProject {
+    id: string,                     // id проекта
+    destination: string,            // база приемник проекта
+    sources: IExchangeSource[]      // список баз источников для проекта
+}
+
+/*
 export interface IExchangeBase  extends IExchangeSource{
     db_type?: string,
     db_exchange_type?: string,
@@ -25,13 +34,9 @@ export interface IExchangeBase  extends IExchangeSource{
     db_user?: string,
     db_password?: string
 }
+*/
 
-export interface IJettiProject {
-    id: string,
-    destination: string,
-    sources: IExchangeSource[]
-}
-
+// тестовые параметры для базы источника Russia
 export const RussiaSource: IExchangeSource = {
     id: 'Russia',
     code: 'RU',
@@ -40,7 +45,7 @@ export const RussiaSource: IExchangeSource = {
     currency: 'A4867005-66B8-4A8A-9105-3F25BB081936',
     TransitStorehouse: '',
     CounterpartieFolder: '42E29350-AF24-11EA-B93F-AD0D181CA7FB',
-    ProductFolder: null,
+    ProductFolder: '149A6390-B16F-11EA-AF55-1D3B6811F490',
     exchangeStores: ['F3FE986C-B007-427B-B7E4-69A1CE96D807', '22925F3E-7597-4362-BD3C-FFEB20913B7B', 'B72A88A5-E93A-4959-B2DC-287B798CA171', '7ECAB182-7C77-4827-AD7F-8BB1DB40D8E6',
                      '048D8729-EAF7-499D-BD3F-AAC1DA034980', '0C8194C5-063D-4A55-9FC1-D7579A47DD92', 'F5288B74-B51C-42A0-A54A-08096BF4544C', '6AA733F2-3584-47DE-B056-15BEBE9D7EEA', 
                      'A7CB5B72-D6D8-4221-80BF-2BED6FEF1799', '99BDDECA-2E52-4650-90A6-637CC6647A5F', 'F572B5FB-8CD0-46B9-8277-384C9E88EF15', 'C02BE998-06AE-4650-93B4-52D40276A09B', 
@@ -55,6 +60,7 @@ export const RussiaSource: IExchangeSource = {
                          '5D9006EB-CB07-4E32-98AD-8440A8BE650D', '6096BAF5-CDC0-4170-91C1-5128F057DA9A', 'BBB0A9C4-8348-447F-8346-0332FCE1EA0A']
 }
 
+// тестовые прараметры для проекта SMV
 export const SMVProject: IJettiProject = {
     id: 'SMV',
     destination: 'SMV',
