@@ -5,6 +5,7 @@ import { IJettiProject } from "./jetti-projects";
 import { RussiaSource } from "./jetti-projects";
 import { ImportCounterpartieToJetti } from "./iiko-to-jetti-catalog-counterpartie";
 import { ImportProductToJetti } from "./iiko-to-jetti-catalog-product";
+import { ImportPersonSQLToJetti } from "./iiko-to-jetti-person";
 
 
 export async function AutosincIkoToJetty(project: IJettiProject, syncSource: string) {
@@ -22,18 +23,19 @@ export async function AutosincIkoToJetty(project: IJettiProject, syncSource: str
         startDate: RussiaSource.firstDate,
         lastSyncDate: new Date(2020,6,1,15,25,36),
         autosync: true,
-        forcedUpdate: false, // ! пока обновление только новых данных
+        forcedUpdate: true, // ! пока обновление только новых данных
         logLevel: 0,
         startTime: dt,
         finishTime: null
     };
 
-    console.log("Справочник номенклатуры.");
-    ImportProductToJetti(syncParams).catch(() => { });
+    //console.log("Справочник номенклатуры.");
+    //ImportProductToJetti(syncParams).catch(() => { });
 
     //console.log("Справочник контрагентов.");
     //ImportCounterpartieToJetti(syncParams).catch(() => { });
 
-    //!console.log("Справочник физлица&менеджеры");
+    console.log("Справочник физлица&менеджеры");
+    ImportPersonSQLToJetti(syncParams).catch(() => { });
 
 }
